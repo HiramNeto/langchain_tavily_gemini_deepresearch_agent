@@ -1,0 +1,27 @@
+{
+  "name": "deep_research_langchain_tavily_gemini",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.0",
+    "@langchain/community": "^0.3.41",
+    "@langchain/core": "^0.3.45",
+    "@langchain/langgraph": "^0.2.64",
+    "@langchain/tavily": "^0.1.1",
+    "@tavily/core": "^0.3.7",
+    "dotenv": "^16.5.0",
+    "langchain": "^0.3.22",
+    "zod": "^3.24.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
