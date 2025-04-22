@@ -5,25 +5,22 @@ export const gemini = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
 
 // Model configuration with rate limits
 export const models = {
-  // More than average reasoning, lower rate limit (10 requests/min)
-  premiumPlus: "gemini-2.5-flash-preview-04-17",
+  // More than average reasoning, lower rate limit (5 requests/min - 25 requests/day)
+  premiumPlus: "gemini-2.5-pro-exp-03-25",
 
-  // Most capable, best reasoning, lowest rate limit (10 requests/min)
+  // Most capable, best reasoning, lowest rate limit (10 requests/min - 500 requests/day)
   premium: "gemini-2.5-flash-preview-04-17",
   
-  // Intermediate capability and rate limit (15 requests/min)
+  // Intermediate capability and rate limit (15 requests/min - 1500 requests/day)
   standard: "gemini-2.0-flash",
   
-  // Most limited capability, highest rate limit (30 requests/min)
+  // Most limited capability, highest rate limit (30 requests/min - 1500 requests/day)
   basic: "gemini-2.0-flash-lite"
 };
 
 // Define prompt templates
 export const prompts = {
-  planningPrompt: /*`You are a strategic research planner with expertise in breaking down complex
-                  questions into logical search steps. Generate focused, specific, and self-contained queries that
-                  will yield relevant information for the research topic.`,*/
-                  `You are a strategic research planner specializing in comprehensive information retrieval. Your task is to:
+  planningPrompt: `You are a strategic research planner specializing in comprehensive information retrieval. Your task is to:
 
                   1. Analyze the research topic to identify its core concepts, entities, and knowledge domains
                   2. Generate 5 highly focused search queries that:
@@ -37,10 +34,7 @@ export const prompts = {
 
                   Return only the most effective queries that will maximize information coverage while minimizing search iterations.`,
 
-  summarizePrompt:/*`Extract and synthesize only the information relevant to the research
-                  topic from this content. Preserve specific data, terminology, and
-                  context while removing irrelevant information.`,*/
-                  `Analyze the provided content and extract ONLY information directly relevant to the research topic. Your summary should:
+  summarizePrompt:`Analyze the provided content and extract ONLY information directly relevant to the research topic. Your summary should:
 
                   1. Prioritize facts, statistics, expert opinions, and substantive analysis related to the topic
                   2. Preserve domain-specific terminology, numerical data, dates, and key entity relationships
@@ -53,10 +47,7 @@ export const prompts = {
 
                   
   
-  evaluationPrompt: /*`Analyze these search results against the original research goal. Identify
-                   specific information gaps and generate targeted follow-up queries to fill
-                   those gaps. If no significant gaps exist, indicate that research is complete.`,*/ 
-                   `As a pragmatic research analyst, evaluate if the collected information is SUFFICIENT to answer the original research question.
+  evaluationPrompt:`As a pragmatic research analyst, evaluate if the collected information is SUFFICIENT to answer the original research question.
 
                    Consider the following:
                    1. Does the information cover the main aspects needed to adequately address the topic?
@@ -78,10 +69,7 @@ export const prompts = {
                    Remember: It's better to proceed with sufficient information than to get stuck in endless research loops seeking theoretical completeness.`,
 
 
-  filterPrompt: /*`Evaluate each search result for relevance, accuracy, and information value
-                related to the research topic. At the end, you need to provide a list of
-                source numbers with the rank of relevance. Remove the irrelevant ones.`,*/
-                `Critically evaluate each search result against the research topic, assessing:
+  filterPrompt: `Critically evaluate each search result against the research topic, assessing:
 
                 1. RELEVANCE: How directly does the content address the specific research question?
                 2. INFORMATION VALUE: Does it provide unique, substantive information not found in other results?
@@ -97,14 +85,7 @@ export const prompts = {
 
                 Do not explain your reasoning - return only the JSON object.`,
 
-  reportPrompt: /*`Create a comprehensive, publication-quality markdown research report based exclusively
-               on the provided sources. The report should include: title, introduction, analysis (multiple sections with insights titles)
-               and conclusions, references. Use proper citations (source with link; using \n\n \\[Ref. No.\\] to improve format),
-               organize information logically, and synthesize insights across sources. Include all relevant details while
-               maintaining readability and coherence. In each section, You MUST write in plain
-               paragraghs and NEVER describe the content following bullet points or key points (1,2,3,4... or point X: ...)
-               to improve the report readability.`*/
-               `Create a comprehensive, publication-quality markdown research report based exclusively on the provided sources. Structure as follows:
+  reportPrompt:`Create a comprehensive, publication-quality markdown research report based exclusively on the provided sources. Structure as follows:
 
                 # [Concise, Descriptive Title]
 

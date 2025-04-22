@@ -4,8 +4,13 @@ import { ResearchPlan } from '../models/plan';
 export async function generateResearchPlan(topic: string, maxQueries: number = 5): Promise<string[]> {
   console.log(`Generating research plan for topic: ${topic}`);
   
-  // Generate plan with Gemini - using premium plus model for complex reasoning task
-  const planModel = gemini.getGenerativeModel({ model: models.premiumPlus });
+  // Generate plan with Gemini - using premium plus model with creative temperature for brainstorming
+  const planModel = gemini.getGenerativeModel({ 
+    model: models.premiumPlus,
+    generationConfig: {
+      temperature: 0.7, // Higher temperature for creative query generation
+    }
+  });
   const planResponse = await planModel.generateContent({
     contents: [{ role: "user", parts: [{ text: `${prompts.planningPrompt}\n\nResearch Topic: ${topic}` }] }],
   });

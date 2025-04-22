@@ -46,7 +46,13 @@ export async function summarizeContent(content: string, query: string): Promise<
   console.log('Summarizing content...');
   
   try {
-    const model = gemini.getGenerativeModel({ model: models.basic });
+    const model = gemini.getGenerativeModel({ 
+      model: models.basic,
+      generationConfig: {
+        temperature: 0.1, // Lower temperature for factual summarization
+        maxOutputTokens: 1024,
+      }
+    });
     const response = await model.generateContent({
       contents: [{ 
         role: "user", 
@@ -54,9 +60,6 @@ export async function summarizeContent(content: string, query: string): Promise<
           text: `${prompts.summarizePrompt}\n\n<Raw Content>${content}</Raw Content>\n\n<Research Topic>${query}</Research Topic>` 
         }] 
       }],
-      generationConfig: {
-        maxOutputTokens: 1024,
-      }
     });
     
     return response.response.text();

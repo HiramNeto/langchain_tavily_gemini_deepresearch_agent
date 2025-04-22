@@ -23,6 +23,7 @@ interface ResearchState {
     title: string;
     content: string;
   };
+  iterationCount?: number;
 }
 
 // Create state definition using Annotation
@@ -41,7 +42,8 @@ let stateDefinition = Annotation.Root({
   report: Annotation<{
     title: string;
     content: string;
-  }>()
+  }>(),
+  iterationCount: Annotation<number>(),
 });
 
 // Define input type for the node functions
@@ -60,34 +62,59 @@ const planingNode = async (state: typeof stateDefinition.State) => {
           
   return {
     topic, // Keep the original topic
-    queries // Add the generated queries
+    queries, // Use the generated queries
+    iterationCount: 0 // Initialize iteration counter
   };
 };
 
-const searchingNode = async (state: typeof stateDefinition.State) => {
-   
-  // Extract queries directly from input
-  const queries = state.queries;
-  
-  if (!queries || queries.length === 0) throw new Error("No queries provided for search");
-  
-  // Process all queries and collect results
-  const results = await Promise.all(
-    queries.map(async (query) => ({
-      query,
-      searchResults: await runSearch.search(query)
-    }))
-  );
-  
-  // Return ONLY the updated field: results
-  return { results };
 
+const searchingNode = async (state: typeof stateDefinition.State) => {
+  // Extract topic and queries
+  const topic = state.topic;
+  const queries = state.queries || [];
+  
+  if (!topic) throw new Error("No topic provided for search");
+  if (queries.length === 0) throw new Error("No queries to search for");
+  
+  // Incremental search results
+  const newResults = [];
+  
+  // Execute searches
+  for (const query of queries) {
+    // Search for the query
+    const searchResults = await runSearch.search(query);
+    // Process the results to add summaries
+    const processedResults = await runSearch.processSearchResults(searchResults, query);
+    
+    // Store the results with their query
+    newResults.push({
+      query,
+      searchResults: processedResults
+    });
+  }
+  
+  // Combine previous and new results, only if there were previous results
+  const combinedResults = state.results && state.results.length > 0
+    ? [...state.results, ...newResults]
+    : newResults;
+
+  // Increment the iteration counter
+  const iterationCount = (state.iterationCount || 0) + 1;
+  console.log(`Search iteration: ${iterationCount}`);
+  
+  return {
+    ...state,
+    results: combinedResults,
+    queries: [], // Clear the queries as they've been processed
+    iterationCount // Update the iteration counter
+  };
 };
 
 const evaluatingNode = async (state: typeof stateDefinition.State) => {
   // Extract topic and results directly from input
   const topic = state.topic;
   const results = state.results;
+  const iterationCount = state.iterationCount || 0;
 
   if (!topic) throw new Error("No topic provided for evaluation");
   if (!results || results.length === 0) throw new Error("No results to evaluate");
@@ -97,17 +124,36 @@ const evaluatingNode = async (state: typeof stateDefinition.State) => {
     results.flatMap(r => r.searchResults.results)
   );
 
-  // Evaluate completeness of research
-  const evaluation = await evaluateNode.evaluateCompleteness(topic, flattenedResults);
+  // Force completion after maximum iterations (e.g., 3)
+  const MAX_ITERATIONS = 3;
+  if (iterationCount >= MAX_ITERATIONS) {
+    console.log(`Reached maximum iterations (${MAX_ITERATIONS}). Forcing research completion.`);
+    
+    // Filter results to keep only the most relevant ones
+    const filteredRawResults = await evaluateNode.filterSearchResults(topic, flattenedResults);
+    
+    return {
+      isComplete: true,
+      filteredResults: [{
+        query: topic,
+        searchResults: filteredRawResults.results.length > 0 
+          ? filteredRawResults.results 
+          : [{ // Add a placeholder result if no results were found
+              title: "No relevant results found",
+              link: "",
+              content: "Please try different search queries."
+            }]
+      }],
+      iterationCount
+    };
+  }
 
-  // Filter results to keep only the most relevant ones
+  // Continue with normal evaluation if under max iterations
+  const evaluation = await evaluateNode.evaluateCompleteness(topic, flattenedResults);
   const filteredRawResults = await evaluateNode.filterSearchResults(topic, flattenedResults);
 
-  // Ensure we have at least one result in filteredResults, even if it's empty
-  // This prevents the branch condition from failing
   return {
-    isComplete: evaluation.isComplete === true, // Ensure it's a boolean true/false
-    // If not complete, add new queries to the state
+    isComplete: evaluation.isComplete === true,
     ...(evaluation.isComplete ? {} : { queries: evaluation.queries }),
     filteredResults: [{
       query: topic,
@@ -118,7 +164,8 @@ const evaluatingNode = async (state: typeof stateDefinition.State) => {
             link: "",
             content: "Please try different search queries."
           }]
-    }]
+    }],
+    iterationCount
   };
 };
 

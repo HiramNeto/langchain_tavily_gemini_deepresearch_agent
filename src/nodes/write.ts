@@ -13,6 +13,7 @@ export async function generateReport(
   const model = gemini.getGenerativeModel({ 
     model: models.premiumPlus,
     generationConfig: {
+      temperature: 0.6,
       maxOutputTokens: maxTokens,
     }
   });

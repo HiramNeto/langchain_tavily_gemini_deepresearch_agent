@@ -13,7 +13,12 @@ export async function evaluateCompleteness(
     return { isComplete: false, queries: [`${topic} overview`, `${topic} key aspects`] };
   }
 
-  const evaluationModel = gemini.getGenerativeModel({ model: models.premium });
+  const evaluationModel = gemini.getGenerativeModel({ 
+    model: models.premium,
+    generationConfig: {
+      temperature: 0.2, // Lower temperature for consistent evaluation
+    }
+  });
   const standardModel = gemini.getGenerativeModel({ model: models.standard });
 
   try {
@@ -82,7 +87,12 @@ export async function filterSearchResults(
     return results; // Return empty results if nothing to filter
   }
 
-  const model = gemini.getGenerativeModel({ model: models.standard }); // Use standard model for potentially complex filtering logic
+  const model = gemini.getGenerativeModel({ 
+    model: models.standard,
+    generationConfig: {
+      temperature: 0.1, // Lower temperature for consistent filtering
+    }
+  });
 
   try {
     const response = await model.generateContent({
