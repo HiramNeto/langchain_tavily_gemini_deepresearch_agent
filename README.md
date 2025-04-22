@@ -71,21 +71,21 @@ Report:
 ## Introdução
 ...
 ```
-🏗️ Architecture
+## 🏗️ Architecture
 The agent is built using LangChain's StateGraph to orchestrate the research workflow. Each stage is implemented as a distinct node in the graph:
 Plan Node: Generates targeted search queries using Gemini-2.5-pro-exp model
 Search Node: Executes searches via Tavily API and processes results
 Evaluation Node: Determines if research is complete or needs more information
 Write Node: Generates final research report using Gemini's premium models
 
-Model Selection Strategy
+# Model Selection Strategy
 The agent uses different Gemini models for different tasks based on complexity and rate limits:
 premiumPlus (gemini-2.5-pro-exp): Planning and report writing (most complex reasoning)
 premium (gemini-2.5-flash-preview): Evaluations (balanced reasoning)
 standard (gemini-2.0-flash): Filtering (intermediate tasks)
 basic (gemini-2.0-flash-lite): Summarization (high-volume, simpler tasks)
 
-🧩 Extending the Agent
+## 🧩 Extending the Agent
 This implementation provides a solid foundation that can be extended in various ways:
 Add a web interface
 Support for different output formats (PDF, presentation)
@@ -94,22 +94,22 @@ Add multimedia (image, video) search capabilities
 Add domain-specific knowledge enhancements
 Implement user feedback mechanisms
 
-📚 Dependencies
+## 📚 Dependencies
 Main dependencies include:
 LangChain (@langchain/core, @langchain/langgraph)
 Google Generative AI SDK (@google/generative-ai)
 Tavily Search API (@langchain/tavily)
 TypeScript and related tooling
 
-🔧 Troubleshooting
+## 🔧 Troubleshooting
 API Rate Limits
 The agent uses different Gemini models with varying rate limits. If you encounter rate limit errors:
 Adjust the MAX_ITERATIONS constant in src/graph.ts
 Implement retry logic with exponential backoff
 Consider upgrading your API plan for higher rate limits
 
-Model Selection
+# Model Selection
 Different models have different capabilities. In the src/utils/gemini.ts file, you can modify which models are used for each task.
 
-🤝 Contributing
+## 🤝 Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.
