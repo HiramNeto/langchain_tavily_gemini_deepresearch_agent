@@ -9,7 +9,6 @@ export async function search(query: string): Promise<SearchResults> {
   try {
     // Using the new TavilySearch class
     const searchTool = new TavilySearch({
-      //apiKey: process.env.TAVILY_API_KEY || '',
       maxResults: 5,
       includeRawContent: true,
       searchDepth: "basic"
@@ -41,35 +40,6 @@ export async function search(query: string): Promise<SearchResults> {
     return new SearchResults([]);
   }
 }
-
-// Fetch content from a URL (add check for valid URL)
-/*async function fetchContent(url: string): Promise<string> {
-   // Basic check if URL seems valid before attempting fetch
-   if (!url || !url.startsWith('http')) {
-      console.warn(`Skipping fetch for invalid URL: ${url}`);
-      return '';
-   }
-  try {
-    console.log(`Trying to fetch content from ${url}`);
-    const response = await axios.get(url, {
-      timeout: 20000, // 20 second timeout
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; ResearchBot/1.0)' } // More descriptive User-Agent
-    });
-    console.log(response);
-    // Very basic HTML to text conversion (consider a library like 'html-to-text' for better results)
-    return response.data.toString()
-      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
-      .replace(/<[^>]*>/g, ' ')
-      .replace(/\s{2,}/g, ' ')
-      .trim();
-  } catch (error) {
-    // Log specific error type if possible
-    const errorMsg = error instanceof Error ? error.message : String(error);
-    console.error(`Failed to fetch content from ${url}: ${errorMsg}`);
-    return ''; // Return empty string on fetch failure
-  }
-}*/
 
 // Summarize content using Gemini - using basic model as this is high-volume, simpler task
 export async function summarizeContent(content: string, query: string): Promise<string> {

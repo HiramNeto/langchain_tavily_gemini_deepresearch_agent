@@ -142,6 +142,23 @@ const writingNode = async (state: typeof stateDefinition.State) => {
   return { report };
 };
 
+// Define the research workflow graph
+// This graph orchestrates the entire research process from planning to report generation
+
+// StateGraph: Manages the flow of data between nodes in our research workflow
+// Each node represents a specific step in the research process
+// Edges define the possible transitions between steps
+
+// Graph structure:
+// 1. Plan -> Search -> Evaluate -> [conditional branch]
+//    a. If research is complete -> Write -> END
+//    b. If research is incomplete -> Search (loop back for more data)
+
+// Node descriptions:
+// - Plan: Generates initial research queries based on the topic
+// - Search: Executes search queries and collects results
+// - Evaluate: Assesses if we have sufficient information and filters results
+// - Write: Generates the final research report
 const graph = new StateGraph(stateDefinition)
   .addNode("Plan", planingNode)
   .addNode("Search", searchingNode)

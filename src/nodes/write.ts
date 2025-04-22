@@ -11,7 +11,7 @@ export async function generateReport(
   
   // Using premium model for the most complex, reasoning-intensive task
   const model = gemini.getGenerativeModel({ 
-    model: models.premium,
+    model: models.premiumPlus,
     generationConfig: {
       maxOutputTokens: maxTokens,
     }

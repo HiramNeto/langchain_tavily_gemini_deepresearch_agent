@@ -4,17 +4,19 @@ import { ResearchPlan } from '../models/plan';
 export async function generateResearchPlan(topic: string, maxQueries: number = 5): Promise<string[]> {
   console.log(`Generating research plan for topic: ${topic}`);
   
-  // Generate plan with Gemini - using standard model for complex reasoning task
-  const model = gemini.getGenerativeModel({ model: models.standard });
-  const planResponse = await model.generateContent({
+  // Generate plan with Gemini - using premium plus model for complex reasoning task
+  const planModel = gemini.getGenerativeModel({ model: models.premiumPlus });
+  const planResponse = await planModel.generateContent({
     contents: [{ role: "user", parts: [{ text: `${prompts.planningPrompt}\n\nResearch Topic: ${topic}` }] }],
   });
   
   const plan = planResponse.response.text();
   console.log(`Generated plan: ${plan}`);
   
+  // Use standard model to extract structured queries from the plan
+  const parseModel = gemini.getGenerativeModel({ model: models.standard });
   // Extract structured queries from the plan - with more specific instructions
-  const parseResponse = await model.generateContent({
+  const parseResponse = await parseModel.generateContent({
     contents: [{ 
       role: "user", 
       parts: [{ text: `Extract the search queries from this research plan as a JSON array with the following format: {"queries": ["query1", "query2", ...]}:\n\n${plan}` }] 

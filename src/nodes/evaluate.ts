@@ -13,23 +13,18 @@ export async function evaluateCompleteness(
     return { isComplete: false, queries: [`${topic} overview`, `${topic} key aspects`] };
   }
 
-  const model = gemini.getGenerativeModel({ model: models.standard });
+  const evaluationModel = gemini.getGenerativeModel({ model: models.premium });
+  const standardModel = gemini.getGenerativeModel({ model: models.standard });
 
   try {
-    const response = await model.generateContent({
-      contents: [{
-        role: "user",
-        parts: [{
-          text: `${prompts.evaluationPrompt}\n\n<Research Topic>${topic}</Research Topic>\n\n<Search Results>${results.toString()}</Search Results>`
-        }]
-      }],
+    const response = await evaluationModel.generateContent({
+      contents: [{ role: "user", parts: [{ text: `${prompts.evaluationPrompt}\n\n<Research Topic>${topic}</Research Topic>\n\n<Search Results>${results.toString()}</Search Results>` }] }],
     });
 
     const evaluation = response.response.text();
     console.log('Raw Evaluation result text:', evaluation); // Log raw evaluation
-
     // Parse follow-up queries from the evaluation
-    const parseResponse = await model.generateContent({
+    const parseResponse = await standardModel.generateContent({
       contents: [{
         role: "user",
         parts: [{
@@ -44,13 +39,12 @@ export async function evaluateCompleteness(
 
     const parsedText = parseResponse.response.text();
     console.log('Raw JSON extraction text:', parsedText); // Log raw text before parsing
-
     // **Add try-catch around JSON parsing**
     try {
       const parsedEvaluation = await parseJsonFromText<ResearchEvaluation>(parsedText);
       // **Add validation check**
       if (typeof parsedEvaluation.isComplete !== 'boolean' || !Array.isArray(parsedEvaluation.queries)) {
-         console.warn("Parsed evaluation JSON has incorrect structure. Defaulting to not complete.", parsedEvaluation);
+        console.warn("Parsed evaluation JSON has incorrect structure. Defaulting to not complete.", parsedEvaluation);
          // Provide default queries if structure is wrong but parsing succeeded
          const defaultQueries = [`${topic} further details`, `${topic} recent developments`];
          return { isComplete: false, queries: parsedEvaluation.queries?.length > 0 ? parsedEvaluation.queries : defaultQueries };
@@ -60,6 +54,7 @@ export async function evaluateCompleteness(
     } catch (parseError) {
       console.error("Failed to parse JSON from evaluation response:", parseError);
       console.warn("Defaulting to research not complete due to parsing error.");
+        
       // Fallback if JSON parsing fails completely
       return { isComplete: false, queries: [`${topic} summary`, `${topic} related topics`] };
     }

@@ -9,7 +9,8 @@ import { researcher } from "./graph";
 async function main() {
   try {
     // Define a research topic
-    const researchTopic = "Quem foi eleito presidente do brasil em 2022?";
+    //const researchTopic = "Quem foi eleito presidente do brasil em 2022?";
+    const researchTopic = "O que devo considerar ao comprar um carro elétrico no Brasil em 2025?";
     
     // Execute the research graph with the topic directly
     const result = await researcher.invoke({
