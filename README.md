@@ -34,12 +34,12 @@ Plan → Search → Evaluate → [If complete] → Write → END
 
 ## 🚀 Installation
 
-# Clone the repository
+### Clone the repository
 ```
 git clone https://github.com/yourusername/deep-research-agent.git
 cd deep-research-agent
 ```
-# Install dependencies
+### Install dependencies
 ```
 npm install
 ```
@@ -78,7 +78,7 @@ Search Node: Executes searches via Tavily API and processes results
 Evaluation Node: Determines if research is complete or needs more information
 Write Node: Generates final research report using Gemini's premium models
 
-# Model Selection Strategy
+### Model Selection Strategy
 The agent uses different Gemini models for different tasks based on complexity and rate limits:
 premiumPlus (gemini-2.5-pro-exp): Planning and report writing (most complex reasoning)
 premium (gemini-2.5-flash-preview): Evaluations (balanced reasoning)
@@ -108,7 +108,7 @@ Adjust the MAX_ITERATIONS constant in src/graph.ts
 Implement retry logic with exponential backoff
 Consider upgrading your API plan for higher rate limits
 
-# Model Selection
+### Model Selection
 Different models have different capabilities. In the src/utils/gemini.ts file, you can modify which models are used for each task.
 
 ## 🤝 Contributing
